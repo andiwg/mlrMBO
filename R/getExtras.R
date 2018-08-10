@@ -104,7 +104,9 @@ getExtras = function(n, prop, train.time, control) {
       ex$filter.replace = prop$filter.replace[i]
     }
     # if we use scheduling, store predicted exec.times
-    if (control$schedule.method == "smartParallelMap"||control$schedule.method == "scheduleKnapsack") {
+    if (control$schedule.method == "smartParallelMap" ||
+        control$schedule.method == "scheduleKnapsack" || 
+        control$schedule.method == "advancedScheduling") {
       ex$predicted.time = predicted.time[i]
       ex$predicted.time.se = predicted.time.se[i]
       ex$scheduled.at = NA_real_
