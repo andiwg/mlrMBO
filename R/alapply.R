@@ -5,7 +5,7 @@ startJob = function(coreid, sched.info, X, FUN){
     if(any(sched.info$ava[,coreid])){
       # job ava
       jobid <- which(sched.info$ava[,coreid])[1]
-    }else {
+    } else {
       # steal job from other core
       ava = sapply(X = seq_along(sched.info$ava[,1]), FUN = function (i) any(sched.info$ava[i,]))
       jobid = which.max(ava)
@@ -93,7 +93,6 @@ alapply = function (X, scheduled.on, wait.at, FUN){
         tmp = tmp[-1]
         sched.info = startJob(coreid, sched.info, X, FUN)
       }else{
-        write(paste0("wlistend Job ", jobid), file = "scheduling", append = TRUE)
         warning("finished job in wait list, should be fine")
         wid = which(sapply(X = sched.info$waiting.jobs, FUN = function (j){ 
           if (!is.null(j)){
@@ -102,12 +101,13 @@ alapply = function (X, scheduled.on, wait.at, FUN){
             return(FALSE)
           }
         }))
-        sched.info$ava[jobid,] = FALSE
-        fin[jobid] = TRUE
+        write(paste0("wlistend Job ", sched.info$waiting[wid]), file = "scheduling", append = TRUE)
+        sched.info$ava[sched.info$waiting[wid],] = FALSE
+        fin[sched.info$waiting[wid]] = TRUE
         sched.info$wtime[wid] = 0
         res[[sched.info$waiting[wid]]] = tmp[[1]]
         tmp = tmp[-1]
-        system(paste0("kill -KILL ", sched.info$waiting.jobs[[wid]]$pid), intern = TRUE) #any other way?
+        system(paste0("kill -KILL ", sched.info$waiting.jobs[[wid]]$pid))#, intern = TRUE) #any other way?
       }
     }
     # Jobs bei Bedarf anhalten

@@ -98,19 +98,20 @@ proposePointsQKPCB = function(opt.state){
   if(is.null(predicted.time.se))
     predicted.time.se = rep(NA_real_, length(predicted.time))
   
-  priorities = -raw.points$multipoint.cb.lambdas
-  priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
+  priorities = -raw.points$multipoint.cb.lambdas - min(-raw.points$multipoint.cb.lambdas) + 0.1
+#  priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
   t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
   
-  p.order = order(priorities, decreasing = TRUE)
-  occupied.time = 0
-  sel.points = rep(FALSE, length(priorities))
-  for (i in p.order){
-    if((predicted.time[i] + occupied.time) <= (t.max * control$schedule.nodes) && predicted.time[i] <= t.max){
-      sel.points[i] = TRUE
-      occupied.time = occupied.time + predicted.time[i]
-    }
-  }
+ # p.order = order(priorities, decreasing = TRUE)
+#  occupied.time = 0
+#  sel.points = rep(FALSE, length(priorities))
+#  for (i in p.order){
+#    if((predicted.time[i] + occupied.time) <= (t.max * control$schedule.nodes) && predicted.time[i] <= t.max){
+#      sel.points[i] = TRUE
+#      occupied.time = occupied.time + predicted.time[i]
+#    }
+#  }
+  sel.points = greedyQKP(priorities, predicted.time, raw.points$prop.points,t.max * control$schedule.nodes)
   
   res = list()
   res$prop.points = raw.points$prop.points[sel.points,]
