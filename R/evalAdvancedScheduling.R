@@ -56,7 +56,13 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
     
 
     funRes = alapply(X = xs.trafo, scheduled.on = scheduled.on, wait.at = scheduled$wait.at, FUN = wrapFun)
-    do.stuff = 1
+    
+    for (i in seq_along(funRes)) {
+      if (!is.null(funRes[[i]]$stime) && funRes[[i]]$stime > 0){
+        extras[[i]]$stop.time = funRes[[i]]$stime
+        extras[[i]]$cont.time = funRes[[i]]$ctime
+      }
+    }
   } else{
 
     imputeY = getOptProblemControl(

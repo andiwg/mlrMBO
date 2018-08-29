@@ -18,7 +18,7 @@ startJob = function(coreid, sched.info, X, FUN){
       sched.info$jobs[coreid] = sched.info$waiting.jobs[waiting]
       #sched.info$waiting[waiting] = NA
       #sched.info$waiting.jobs[[waiting]] = NA
-      sched.info$wtime[waiting] = proc.time()[3] - sched.info$wtime[waiting]
+      sched.info$ctime[waiting] = proc.time()[3]
       sched.info$job.pid[coreid] = sched.info$jobs[[coreid]]$pid
       system(paste0("kill -CONT ", sched.info$job.pid[coreid]), intern = TRUE)
     }else{
@@ -70,7 +70,8 @@ alapply = function (X, scheduled.on, wait.at, FUN){
   start.time = proc.time()[3]
   next.change = start.time + min(wait.at)
   sched.info$waiting = numeric(length(sched.info$job.id))
-  sched.info$wtime = numeric(length(sched.info$job.id))
+  sched.info$stime = numeric(length(sched.info$job.id))
+  sched.info$ctime = numeric(length(sched.info$job.id))
   sched.info$waiting.jobs = vector("list", length(sched.info$job.id))
   while (!all(fin)) {
     # fertige Jobs beenden
@@ -104,7 +105,7 @@ alapply = function (X, scheduled.on, wait.at, FUN){
         write(paste0("wlistend Job ", sched.info$waiting[wid]), file = "scheduling", append = TRUE)
         sched.info$ava[sched.info$waiting[wid],] = FALSE
         fin[sched.info$waiting[wid]] = TRUE
-        sched.info$wtime[wid] = 0
+        sched.info$stime[wid] = 0
         res[[sched.info$waiting[wid]]] = tmp[[1]]
         tmp = tmp[-1]
         system(paste0("kill -KILL ", sched.info$waiting.jobs[[wid]]$pid))#, intern = TRUE) #any other way?
@@ -126,7 +127,7 @@ alapply = function (X, scheduled.on, wait.at, FUN){
         system(paste0("kill -STOP ", jobpid), intern = TRUE)
         sched.info$waiting[coreid] = jobid
         sched.info$waiting.jobs[[coreid]] = sched.info$jobs[[coreid]]
-        sched.info$wtime[[coreid]] = proc.time()[3]
+        sched.info$stime[[coreid]] = proc.time()[3]
         sched.info$ava[jobid, scheduled.on[[jobid]][2]] = TRUE
         sched.info$job.pid[coreid] = NA
         sched.info$jobs[coreid] = NA
@@ -136,11 +137,15 @@ alapply = function (X, scheduled.on, wait.at, FUN){
     }
   }
   mccollect()# kill childs
-  for (i in sched.info$waiting){
-    if (i > 0){
-      res[[i]]$time = res[[i]]$time - sched.info$wtime[i]
-      res[[i]]$user.extras$exec.time.real = res[[i]]$user.extras$exec.time.real - sched.info$wtime[i]
-      attr(res[[i]]$y,"exec.time") = attr(res[[i]]$y,"exec.time") - sched.info$wtime[i]
+  for (i in seq_along(sched.info$waiting)){
+    job.id = sched.info$waiting[[i]]
+    if (job.id > 0){
+      wtime = sched.info$ctime[i] - sched.info$stime[i]
+      res[[job.id]]$time = res[[i]]$time - wtime
+      res[[job.id]]$user.extras$exec.time.real = res[[i]]$user.extras$exec.time.real - wtime
+      attr(res[[job.id]]$y,"exec.time") = attr(res[[i]]$y,"exec.time") - wtime
+      res[[job.id]]$stime = sched.info$stime[i] - start.time
+      res[[job.id]]$ctime = sched.info$ctime[i] - start.time
     }
   }
   write(paste0("end Execution"), file = "scheduling", append = TRUE)

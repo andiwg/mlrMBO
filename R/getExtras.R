@@ -120,6 +120,10 @@ getExtras = function(n, prop, train.time, control) {
     if(control$schedule.method == "scheduleKnapsack"){
       ex$ks.used = FALSE
     }
+    if(control$schedule.method == "advancedScheduling"){
+      ex$stop.time = NA_real_
+      ex$cont.time = NA_real_
+    }
     if (isTRUE(attr(prop$prop.points, "constant.model"))) {
       ex$constant.model = TRUE
     } else {

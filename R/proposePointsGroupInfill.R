@@ -101,7 +101,6 @@ proposePointsQKPCB = function(opt.state){
   priorities = -raw.points$multipoint.cb.lambdas - min(-raw.points$multipoint.cb.lambdas) + 0.1
 #  priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
   t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
-  
  # p.order = order(priorities, decreasing = TRUE)
 #  occupied.time = 0
 #  sel.points = rep(FALSE, length(priorities))
@@ -111,6 +110,7 @@ proposePointsQKPCB = function(opt.state){
 #      occupied.time = occupied.time + predicted.time[i]
 #    }
 #  }
+  predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
   sel.points = greedyQKP(priorities, predicted.time, raw.points$prop.points,t.max * control$schedule.nodes)
   
   res = list()
