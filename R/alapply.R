@@ -3,7 +3,7 @@ library(parallel)
 startJob = function(coreid, sched.info, X, FUN){
   if(any(sched.info$ava)){
     if(any(sched.info$ava[,coreid])){
-      # job ava
+      # choose task that is ready for execution
       jobid <- which(sched.info$ava[,coreid])[1]
     } else {
       # steal job from other core
@@ -14,29 +14,25 @@ startJob = function(coreid, sched.info, X, FUN){
     sched.info$job.id[coreid] = jobid
     waiting = which(sched.info$waiting == jobid)
     if (length(waiting) == 1){
-      # blockierter Job
+      # paused task
       sched.info$jobs[coreid] = sched.info$waiting.jobs[waiting]
-      #sched.info$waiting[waiting] = NA
-      #sched.info$waiting.jobs[[waiting]] = NA
       sched.info$ctime[waiting] = proc.time()[3]
       sched.info$job.pid[coreid] = sched.info$jobs[[coreid]]$pid
       system(paste0("kill -CONT ", sched.info$job.pid[coreid]), intern = TRUE)
     }else{
-      # neuer Job
+      # new task
       sched.info$jobs[coreid] = list(mcparallel(FUN(X[[jobid]]),
                                                 mc.set.seed = TRUE,
                                                 silent = FALSE))
       sched.info$job.pid[coreid] = sched.info$jobs[[coreid]]$pid
     }
-    write(paste0("new Job: ", jobid, " pid: ", sched.info$job.pid[coreid]  ), file = "scheduling", append = TRUE)
   }
   return(sched.info)
 }
 
 
 alapply = function (X, scheduled.on, wait.at, FUN){
-  messagef("start Job Execution")
-  write(paste0("start Execution"), file = "scheduling", append = TRUE)
+  messagef("start job Execution")
   mccollect(wait = FALSE, timeout = 1)
   sched.info = list()
   sx <- seq_along(X)
@@ -48,11 +44,11 @@ alapply = function (X, scheduled.on, wait.at, FUN){
     data[as.vector(scheduled.on[[i]])] = TRUE
     data
   })
-  sched.info$ava = do.call(rbind,cpu.map)# Jobs bereit zum starten
-  fin <- rep(FALSE, length(X))# Jobs fertig?
-  sched.info$job.id = numeric(hcpu)#Enthaelt die Job Id der gerade laufenden Jobs
+  sched.info$ava = do.call(rbind,cpu.map)
+  fin <- rep(FALSE, length(X))
+  sched.info$job.id = numeric(hcpu)
   # choose first item for each core to start
-  # delete unused cores off the matrix and 
+  # delete unused cores off the matrix
   for (i in 1:hcpu){
     sched.info$job.id[i] = which(sched.info$ava[,i])[1]
     sched.info$ava[sched.info$job.id[i],] = FALSE
@@ -63,10 +59,9 @@ alapply = function (X, scheduled.on, wait.at, FUN){
   sched.info$jobs <- lapply(sched.info$job.id,
                             function(i) mcparallel(FUN(X[[i]]),
                                                    mc.set.seed = TRUE,
-                                                   silent = FALSE))#, mc.affinity = cpu.affinity[[i]]))
+                                                   silent = FALSE))
   sched.info$job.pid <- sapply(X = sched.info$jobs,FUN = function(j) j$pid)
   
-  # wait vars
   start.time = proc.time()[3]
   next.change = start.time + min(wait.at)
   sched.info$waiting = numeric(length(sched.info$job.id))
@@ -74,8 +69,8 @@ alapply = function (X, scheduled.on, wait.at, FUN){
   sched.info$ctime = numeric(length(sched.info$job.id))
   sched.info$waiting.jobs = vector("list", length(sched.info$job.id))
   while (!all(fin)) {
-    # fertige Jobs beenden
-    #tmp = mccollect(sched.info$jobs[!is.na(sched.info$jobs)], wait = FALSE, timeout = 1)
+    # collect finished jobs
+    # tmp = mccollect(sched.info$jobs[!is.na(sched.info$jobs)], wait = FALSE, timeout = 1)
     tmp = mccollect(wait = FALSE, timeout = 1)
     while (!is.null(tmp) && length(tmp) > 0){
       if(is.null(tmp[[1]])){
@@ -85,7 +80,6 @@ alapply = function (X, scheduled.on, wait.at, FUN){
       coreid = which(sched.info$job.pid == names(tmp)[[1]])
       if (length(coreid) == 1){
         jobid = sched.info$job.id[coreid]
-        write(paste0("end Job ", jobid, " pid: ", names(tmp)[[1]]), file = "scheduling", append = TRUE)
         res[[jobid]] = tmp[[1]]
         fin[jobid] = TRUE
         sched.info$job.pid[coreid] = NA
@@ -94,7 +88,6 @@ alapply = function (X, scheduled.on, wait.at, FUN){
         tmp = tmp[-1]
         sched.info = startJob(coreid, sched.info, X, FUN)
       }else{
-        warning("finished job in wait list, should be fine")
         wid = which(sapply(X = sched.info$waiting.jobs, FUN = function (j){ 
           if (!is.null(j)){
             return(j$pid == names(tmp)[[1]])
@@ -102,7 +95,6 @@ alapply = function (X, scheduled.on, wait.at, FUN){
             return(FALSE)
           }
         }))
-        write(paste0("wlistend Job ", sched.info$waiting[wid]), file = "scheduling", append = TRUE)
         sched.info$ava[sched.info$waiting[wid],] = FALSE
         fin[sched.info$waiting[wid]] = TRUE
         sched.info$stime[wid] = 0
@@ -111,7 +103,7 @@ alapply = function (X, scheduled.on, wait.at, FUN){
         system(paste0("kill -KILL ", sched.info$waiting.jobs[[wid]]$pid))#, intern = TRUE) #any other way?
       }
     }
-    # Jobs bei Bedarf anhalten
+    # pause Jobs
     while(proc.time()[3] >= next.change){
       jobid = which.min(wait.at)
       wait.at[jobid] = Inf
@@ -119,10 +111,8 @@ alapply = function (X, scheduled.on, wait.at, FUN){
       coreid = which(sched.info$job.id == jobid)
       if(length(coreid) == 1){
         jobpid = sched.info$job.pid[coreid]
-        write(paste0("pause Job: ", jobid,  " pid: ", jobpid), file = "scheduling", append = TRUE)
         if(is.na(jobpid)){
-          warning("job pid not found, This should not happen")
-          a = 1
+          stop("job pid not found, This should not happen", call. = FALSE)
         }
         system(paste0("kill -STOP ", jobpid), intern = TRUE)
         sched.info$waiting[coreid] = jobid
@@ -136,7 +126,8 @@ alapply = function (X, scheduled.on, wait.at, FUN){
       }
     }
   }
-  mccollect()# kill childs
+  # end finished childprocesses
+  mccollect()
   for (i in seq_along(sched.info$waiting)){
     job.id = sched.info$waiting[[i]]
     if (job.id > 0){
@@ -148,7 +139,5 @@ alapply = function (X, scheduled.on, wait.at, FUN){
       res[[job.id]]$ctime = sched.info$ctime[i] - start.time
     }
   }
-  write(paste0("end Execution"), file = "scheduling", append = TRUE)
-  write(paste0(" "), file = "scheduling", append = TRUE)
   return(res)
 }

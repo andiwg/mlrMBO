@@ -14,7 +14,7 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
       at = double(), #at what time is is scheduled
       wait.at = double()
     )
-    ## scheduling
+    ## Scheduling
     i = 1 # job
     njobs = length(xs)
     scheduled.on = vector("list", njobs)
@@ -38,7 +38,7 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
       }
     }
     ##
-    # reorder jobs to suit the load balancer
+    # reorder jobs for better load balancing
     load.balance.order = order(scheduled$at, decreasing = FALSE)
     scheduled.on = scheduled.on[load.balance.order]
     scheduled = scheduled[load.balance.order,]
@@ -47,7 +47,7 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
     xs.schedule.info = xs.schedule.info[scheduled$job,]
     extras = extras[scheduled$job]
     
-    #put scheduling information into extras
+    # put scheduling information into extras
     for (i in seq_row(scheduled)) {
       extras[[i]]$scheduled.job = scheduled$job[i]
       extras[[i]]$scheduled.on = scheduled$on[i]
@@ -57,6 +57,7 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
 
     funRes = alapply(X = xs.trafo, scheduled.on = scheduled.on, wait.at = scheduled$wait.at, FUN = wrapFun)
     
+    # fix times for paused tasks
     for (i in seq_along(funRes)) {
       if (!is.null(funRes[[i]]$stime) && funRes[[i]]$stime > 0){
         extras[[i]]$stop.time = funRes[[i]]$stime
