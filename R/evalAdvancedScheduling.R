@@ -37,6 +37,35 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
         }
       }
     }
+    
+    ## Reduce number of cuts
+    for( j in min(schedule.nodes, njobs):2){
+      if(occupied.time[j] > 0){
+        remaining.time = t.max - occupied.time[j]
+        job = which(scheduled$on == j & scheduled$wait.at < Inf)
+        rem.job.time = xs.schedule.info$times[job] - scheduled$wait.at[job]
+        if(!is.na(rem.job.time) && rem.job.time < remaining.time){
+          scheduled.on[[job]] = j
+          occupied.time[j-1] = occupied.time[j-1] - rem.job.time
+          scheduled$wait.at[job] = Inf
+        }
+      }else{
+        job = j
+        cores = scheduled.on[[j]]
+        scheduled.on[[j]] = j
+        scheduled$on[j] = j
+                if(scheduled$wait.at[j] < Inf){
+          occupied.time[cores[1]] = occupied.time[cores[1]] - scheduled$wait.at[j] 
+          occupied.time[cores[2]] = occupied.time[cores[2]] - (xs.schedule.info$times[j] - wait.at)
+        } else {
+          occupied.time[cores] = occupied.time[cores] - xs.schedule.info$times[j]
+        }
+        occupied.time[j] = occupied.time[j] + xs.schedule.info$times[j]
+      }
+      
+    }
+    
+    ####
     ##
     # reorder jobs for better load balancing
     load.balance.order = order(scheduled$at, decreasing = FALSE)
