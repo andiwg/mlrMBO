@@ -32,7 +32,7 @@ startJob = function(coreid, sched.info, X, FUN){
 
 
 alapply = function (X, scheduled.on, wait.at, FUN){
-  messagef("start job Execution")
+  messagef("start job Execution of %.f Jobs",length(scheduled.on))
   mccollect(wait = FALSE, timeout = 1)
   sched.info = list()
   sx <- seq_along(X)

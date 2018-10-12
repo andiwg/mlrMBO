@@ -39,12 +39,12 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
     }
     
     ## Reduce number of cuts
-    for( j in min(schedule.nodes, njobs):2){
+    for( j in min(schedule.nodes, njobs):min(2, njobs)){
       if(occupied.time[j] > 0){
         remaining.time = t.max - occupied.time[j]
         job = which(scheduled$on == j & scheduled$wait.at < Inf)
         rem.job.time = xs.schedule.info$times[job] - scheduled$wait.at[job]
-        if(!is.na(rem.job.time) && rem.job.time < remaining.time){
+        if(length(job) == 1 && rem.job.time < remaining.time){
           scheduled.on[[job]] = j
           occupied.time[j-1] = occupied.time[j-1] - rem.job.time
           scheduled$wait.at[job] = Inf
@@ -54,9 +54,10 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
         cores = scheduled.on[[j]]
         scheduled.on[[j]] = j
         scheduled$on[j] = j
-                if(scheduled$wait.at[j] < Inf){
+        if(scheduled$wait.at[j] < Inf){
           occupied.time[cores[1]] = occupied.time[cores[1]] - scheduled$wait.at[j] 
           occupied.time[cores[2]] = occupied.time[cores[2]] - (xs.schedule.info$times[j] - wait.at)
+          scheduled$wait.at[j] = Inf
         } else {
           occupied.time[cores] = occupied.time[cores] - xs.schedule.info$times[j]
         }
@@ -65,6 +66,15 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
       
     }
     
+    ## Test for failures
+    wt = scheduled$wait.at<Inf
+    st = sapply(X = scheduled.on, function(i){
+      length(i) == 1
+    })
+    f = wt & st
+    if (any(f)){
+      stop("failure in static Scheduling")
+    }
     ####
     ##
     # reorder jobs for better load balancing
@@ -82,7 +92,6 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
       extras[[i]]$scheduled.on = scheduled$on[i]
       extras[[i]]$scheduled.at = scheduled$at[i]  
     }
-    
 
     funRes = alapply(X = xs.trafo, scheduled.on = scheduled.on, wait.at = scheduled$wait.at, FUN = wrapFun)
     
