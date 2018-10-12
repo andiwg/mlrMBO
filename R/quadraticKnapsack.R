@@ -28,10 +28,14 @@ QKPValue = function(priorities, QMatrix, selected){
   sum(priorities[selected]) + sum(QMatrix[selected, selected])
 }
 
-greedyQKP = function(priorities, times, xs, limit){
+greedyQKP = function(priorities, times, xs, limit, quadratic = TRUE){
   dist.xs = dist(xs)
   distance = as.matrix(dist.xs)/max(dist.xs)
-  QMatrix = createQMatrix(distance, priorities)
+  if (quadratic){
+    QMatrix = createQMatrix(distance, priorities)
+  }else{
+    QAMtrix = 0 * as.matrix(dist.xs)
+  }
   Candidates = seq_along(priorities)
   
   cSets = lapply(Candidates, function(C){
