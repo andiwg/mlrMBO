@@ -4,7 +4,8 @@
 \alias{makeDiscreteWrapper}
 \title{Treats a categorical variable as a seperator}
 \usage{
-makeDiscreteWrapper(learner, discw.category = NULL, discw.na.val = NULL)
+makeDiscreteWrapper(learner, discw.category = NULL,
+  discw.na.val = NULL)
 }
 \arguments{
 \item{learner}{[\code{Learner}]\cr
@@ -26,3 +27,4 @@ This wrapper will make sure that the learner sees numerical values as independen
 \seealso{
 Other wrapper: \code{\link{makeAsynWrapper}}
 }
+\concept{wrapper}

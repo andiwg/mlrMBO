@@ -15,10 +15,6 @@ createQMatrix = function(distance, priorities){
   res[lower.tri(res, diag = TRUE)] = mat2[lower.tri(res, diag = TRUE)]
   return(res)
 }
-# ralative value old
-relQKPvalues.old = function (QMatrix ,times, selected, priorities){
-  (priorities + colSums(QMatrix[selected, , drop = FALSE])) / times
-}
 # ralative value
 relQKPvalues = function (QMatrix ,times, selected, priorities){
   (priorities + colSums(QMatrix[selected, , drop = FALSE]) + rowSums(QMatrix[,selected , drop = FALSE])) / times
@@ -34,7 +30,7 @@ greedyQKP = function(priorities, times, xs, limit, quadratic = TRUE){
   if (quadratic){
     QMatrix = createQMatrix(distance, priorities)
   }else{
-    QAMtrix = 0 * as.matrix(dist.xs)
+    QMatrix = 0 * as.matrix(dist.xs)
   }
   Candidates = seq_along(priorities)
   

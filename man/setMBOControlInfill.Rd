@@ -4,17 +4,19 @@
 \alias{setMBOControlInfill}
 \title{Extends mbo control object with infill criteria and infill optimizer options.}
 \usage{
-setMBOControlInfill(control, crit = NULL, interleave.random.points = 0L,
-  crit.eqi.beta = 0.75, crit.cb.lambda = 1, crit.cb.pi = NULL,
-  crit.cb.inflate.se = NULL, crit.aei.use.nugget = NULL,
-  filter.proposed.points = NULL, filter.proposed.points.tol = NULL,
-  opt = "focussearch", opt.restarts = NULL, opt.focussearch.maxit = NULL,
+setMBOControlInfill(control, crit = NULL,
+  interleave.random.points = 0L, crit.eqi.beta = 0.75,
+  crit.cb.lambda = 1, crit.cb.pi = NULL, crit.cb.inflate.se = NULL,
+  crit.aei.use.nugget = NULL, filter.proposed.points = NULL,
+  filter.proposed.points.tol = NULL, opt = "focussearch",
+  opt.restarts = NULL, opt.focussearch.maxit = NULL,
   opt.focussearch.points = NULL, opt.cmaes.control = NULL,
   opt.ea.maxit = NULL, opt.ea.mu = NULL, opt.ea.sbx.eta = NULL,
   opt.ea.sbx.p = NULL, opt.ea.pm.eta = NULL, opt.ea.pm.p = NULL,
   opt.ea.lambda = NULL, opt.nsga2.popsize = NULL,
   opt.nsga2.generations = NULL, opt.nsga2.cprob = NULL,
-  opt.nsga2.cdist = NULL, opt.nsga2.mprob = NULL, opt.nsga2.mdist = NULL)
+  opt.nsga2.cdist = NULL, opt.nsga2.mprob = NULL,
+  opt.nsga2.mdist = NULL)
 }
 \arguments{
 \item{control}{[\code{\link{MBOControl}}]\cr
@@ -188,3 +190,4 @@ Other MBOControl: \code{\link{makeMBOControl}},
   \code{\link{setMBOControlMultiPoint}},
   \code{\link{setMBOControlTermination}}
 }
+\concept{MBOControl}

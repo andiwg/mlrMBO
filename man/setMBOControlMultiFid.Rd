@@ -5,7 +5,8 @@
 \title{Set multi-fidelity options.}
 \usage{
 setMBOControlMultiFid(control, param, lvls, costs = NULL,
-  cor.grid.points = NULL, force.last.level.steps = NULL, show.info = NULL)
+  cor.grid.points = NULL, force.last.level.steps = NULL,
+  show.info = NULL)
 }
 \arguments{
 \item{control}{[\code{\link{MBOControl}}]\cr
@@ -45,3 +46,4 @@ Other MBOControl: \code{\link{makeMBOControl}},
   \code{\link{setMBOControlMultiPoint}},
   \code{\link{setMBOControlTermination}}
 }
+\concept{MBOControl}

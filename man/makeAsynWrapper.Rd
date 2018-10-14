@@ -31,3 +31,4 @@ We then will train a model for each of those tasks.
 \seealso{
 Other wrapper: \code{\link{makeDiscreteWrapper}}
 }
+\concept{wrapper}

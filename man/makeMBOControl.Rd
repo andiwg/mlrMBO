@@ -7,10 +7,10 @@
 \usage{
 makeMBOControl(n.objectives = 1L, propose.points = 1L,
   final.method = "best.true.y", final.evals = 0L, y.name = "y",
-  impute.y.fun = NULL, trafo.y.fun = NULL, suppress.eval.errors = TRUE,
-  save.on.disk.at = integer(0L), save.on.disk.at.time = Inf,
-  save.file.path = file.path(getwd(), "mlr_run.RData"),
-  store.model.at = NULL, resample.at = integer(0),
+  impute.y.fun = NULL, trafo.y.fun = NULL,
+  suppress.eval.errors = TRUE, save.on.disk.at = integer(0L),
+  save.on.disk.at.time = Inf, save.file.path = file.path(getwd(),
+  "mlr_run.RData"), store.model.at = NULL, resample.at = integer(0),
   resample.desc = makeResampleDesc("CV", iter = 10),
   resample.measures = list(mse), output.num.format = "\%.3g",
   schedule.method = "none", schedule.nodes = 1L,
@@ -19,8 +19,8 @@ makeMBOControl(n.objectives = 1L, propose.points = 1L,
   time.learner = NULL, time.model.trafo.log = FALSE,
   asyn.wait.for.proposals = TRUE, asyn.skip.filtered.propsals = FALSE,
   asyn.cleanup = FALSE, asyn.impute.method = "min",
-  asyn.impute.quantiles = c(0.25, 0.5, 0.75), asyn.impute.mc.iters = 50,
-  check.constant.model = FALSE)
+  asyn.impute.quantiles = c(0.25, 0.5, 0.75),
+  asyn.impute.mc.iters = 50, check.constant.model = FALSE)
 }
 \arguments{
 \item{n.objectives}{[\code{integer(1)}]\cr
@@ -193,3 +193,4 @@ Other MBOControl: \code{\link{setMBOControlInfill}},
   \code{\link{setMBOControlMultiPoint}},
   \code{\link{setMBOControlTermination}}
 }
+\concept{MBOControl}

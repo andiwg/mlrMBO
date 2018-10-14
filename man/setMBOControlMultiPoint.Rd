@@ -8,8 +8,9 @@ setMBOControlMultiPoint(control, method = NULL, cb.multiple = NULL,
   mean.liar = NULL, cl.lie = NULL, multicrit.objective = NULL,
   multicrit.dist = NULL, multicrit.selection = NULL,
   multicrit.maxit = NULL, multicrit.sbx.eta = NULL,
-  multicrit.sbx.p = NULL, multicrit.pm.eta = NULL, multicrit.pm.p = NULL,
-  groupinfill.sample.n = NULL, groupinfill.dist.penalty = NULL)
+  multicrit.sbx.p = NULL, multicrit.pm.eta = NULL,
+  multicrit.pm.p = NULL, groupinfill.sample.n = NULL,
+  groupinfill.dist.penalty = NULL)
 }
 \arguments{
 \item{control}{[\code{\link{MBOControl}}]\cr
@@ -112,3 +113,4 @@ Other MBOControl: \code{\link{makeMBOControl}},
   \code{\link{setMBOControlMultiFid}},
   \code{\link{setMBOControlTermination}}
 }
+\concept{MBOControl}
