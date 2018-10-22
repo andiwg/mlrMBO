@@ -101,15 +101,29 @@ proposePointsQKPCB = function(opt.state){
   priorities = -raw.points$multipoint.cb.lambdas - min(-raw.points$multipoint.cb.lambdas) + 0.1
   t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
   
-  if (control$schedule.cluster == "distance"){
+  if (control$schedule.ks == "cluster"){
+    priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
+    sel.points = greedyKS(priorities, predicted.time,t.max * control$schedule.nodes)
+  } else if (control$schedule.ks ==  "clusterFF"){
     priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
     p.order = order(priorities, decreasing = TRUE)
     occupied.time = 0
-    sel.points = greedyMinQKP(priorities, predicted.time, raw.points$prop.points,t.max * control$schedule.nodes, quadratic = FALSE)
-  } else {
+    sel.points = rep(FALSE, length(priorities))
+    for (i in p.order){
+      if((predicted.time[i] + occupied.time) <= (t.max * control$schedule.nodes) && predicted.time[i] <= t.max){
+        sel.points[i] = TRUE
+        occupied.time = occupied.time + predicted.time[i]
+      }
+    }
+  } else if(control$schedule.ks ==  "cancellation"){
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
-    sel.points = greedyMinQKP(priorities, predicted.time, raw.points$prop.points,t.max * control$schedule.nodes)
+    sel.points = greedyMinKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,t.max * control$schedule.nodes)
+  } else if(control$schedule.ks ==  "QKP"){
+    predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
+    sel.points = greedyQKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points), t.max * control$schedule.nodes)
   }
+  
+  
   res = list()
   res$prop.points = raw.points$prop.points[sel.points,]
   res$propose.time = raw.points$propose.time[sel.points]
