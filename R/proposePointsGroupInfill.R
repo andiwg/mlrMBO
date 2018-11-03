@@ -102,6 +102,7 @@ proposePointsQKPCB = function(opt.state){
   t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
   
   if (control$schedule.ks == "cluster"){
+    predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
     priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
     sel.points = greedyKS(priorities, predicted.time,t.max * control$schedule.nodes)
   } else if (control$schedule.ks ==  "clusterFF"){
@@ -115,12 +116,14 @@ proposePointsQKPCB = function(opt.state){
         occupied.time = occupied.time + predicted.time[i]
       }
     }
-  } else if(control$schedule.ks ==  "cancellation"){
+  } else if(control$schedule.ks ==  "cancel"){
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
     sel.points = greedyMinKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,t.max * control$schedule.nodes)
   } else if(control$schedule.ks ==  "QKP"){
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
     sel.points = greedyQKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points), t.max * control$schedule.nodes)
+  } else {
+    stop("no valid group Infill")
   }
   
   
