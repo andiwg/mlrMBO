@@ -156,6 +156,7 @@ makeMBOControl = function(n.objectives = 1L,
   schedule.fill.random = TRUE,
   schedule.cluster = "none",
   schedule.ks = NA_character_,
+  schedule.js = TRUE,
   time.learner = NULL,
   time.model.trafo.log = FALSE,
   asyn.wait.for.proposals = TRUE,
@@ -198,7 +199,7 @@ makeMBOControl = function(n.objectives = 1L,
 
   assertString(output.num.format)
   assertChoice(schedule.method, choices = c("none", "smartParallelMap", "asyn", "scheduleKnapsack","advancedScheduling"))
-  assertChoice(schedule.ks, choices = c("none", "cluster", "clusterFF", "QKP", "cancellation"))
+  assertChoice(schedule.ks, choices = c("none", "cluster", "FFcluster", "QKP", "cancel"))
   if (schedule.method == "asyn") {
     if (propose.points > 1L) warning("For schedule.method='asyn' you normally would just use propose.points = 1")
     schedule.nodes = asInteger(schedule.nodes)
@@ -242,6 +243,7 @@ makeMBOControl = function(n.objectives = 1L,
     schedule.fill.random = schedule.fill.random,
     schedule.cluster = schedule.cluster,
     schedule.ks = schedule.ks,
+    schedule.js = schedule.js,
     time.learner = time.learner,
     time.model.trafo.log = time.model.trafo.log,
     asyn.wait.for.proposals = asyn.wait.for.proposals,
