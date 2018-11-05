@@ -16,11 +16,12 @@ makeMBOControl(n.objectives = 1L, propose.points = 1L,
   schedule.method = "none", schedule.nodes = 1L,
   schedule.priority = "infill", schedule.priority.time = FALSE,
   schedule.fill.random = TRUE, schedule.cluster = "none",
-  schedule.ks = NA_character_, time.learner = NULL,
-  time.model.trafo.log = FALSE, asyn.wait.for.proposals = TRUE,
-  asyn.skip.filtered.propsals = FALSE, asyn.cleanup = FALSE,
-  asyn.impute.method = "min", asyn.impute.quantiles = c(0.25, 0.5,
-  0.75), asyn.impute.mc.iters = 50, check.constant.model = FALSE)
+  schedule.ks = NA_character_, schedule.js = TRUE,
+  time.learner = NULL, time.model.trafo.log = FALSE,
+  asyn.wait.for.proposals = TRUE, asyn.skip.filtered.propsals = FALSE,
+  asyn.cleanup = FALSE, asyn.impute.method = "min",
+  asyn.impute.quantiles = c(0.25, 0.5, 0.75),
+  asyn.impute.mc.iters = 50, check.constant.model = FALSE)
 }
 \arguments{
 \item{n.objectives}{[\code{integer(1)}]\cr
