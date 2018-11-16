@@ -22,12 +22,12 @@ evalAdvancedScheduling = function(wrapFun, xs, xs.trafo, xs.schedule.info = NULL
     scheduled.on = vector("list", njobs)
     for (j in seq_len(schedule.nodes)){
       while(i <= njobs){
-        if (t.max - occupied.time[j] >= xs.schedule.info$times[i] - 1) {
+        if (t.max - occupied.time[j] >= xs.schedule.info$times[i] - 1 || j == schedule.nodes) {
           scheduled = rbind(scheduled, list(job = i, on = j, at = occupied.time[j], wait.at = Inf))
           scheduled.on[[i]] = j
           occupied.time[j] = occupied.time[j] + xs.schedule.info$times[i]
           i = i + 1
-          if(t.max - occupied.time[j] <= 1.1){
+          if(t.max - occupied.time[j] <= 1){
             break()
           }
         }else{
