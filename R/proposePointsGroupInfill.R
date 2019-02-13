@@ -120,30 +120,20 @@ proposePointsQKPCB = function(opt.state){
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
     sel.points = greedyMinKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,t.max * control$schedule.nodes)
   } else if(control$schedule.ks == "fixCancel"){
-    #predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
-    #best = which.max(priorities)
-    #pt = predicted.time
-    #pt[best] = t.max * control$schedule.nodes + 1
-    #sel.points = greedyMinKS(priorities, pt, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,(t.max * control$schedule.nodes)-1)
-    #sel.points = c(sel.points, best)
-    #priorities = -raw.points - min(-raw.points$multipoint.cb.lambdas) + 0.1
-    #t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
-    priorities = -raw.points$crit.components$mean - min(-raw.points$crit.components$mean) + 0.1
-    t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
-    sel.points = greedyMinKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,t.max * control$schedule.nodes)
+    best = which.max(priorities)
+    pt = predicted.time
+    pt[best] = t.max * control$schedule.nodes + 1
+    sel.points = greedyMinKS(priorities, pt, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,(t.max * control$schedule.nodes)-1)
+    sel.points = c(sel.points, best)
   } else if(control$schedule.ks == "fixCluster"){
-    #predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
-    #priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
-    #best = which.max(priorities)
-    #pt = predicted.time
-    #pt[best] = t.max * control$schedule.nodes + 1
-    #sel.points = greedyKS(priorities, pt, (t.max * control$schedule.nodes)-1)
-    #sel.points = c(sel.points, best)
-    priorities = -raw.points$crit.components$mean - 2*min(-raw.points$crit.components$mean)
-    t.max = predicted.time[which.max(priorities)] + predicted.time.se[which.max(priorities)]
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
-    sel.points = greedyMinKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points, "negU") ,t.max * control$schedule.nodes)
+    priorities = distanceCluster(priorities = priorities, raw.points, opt.state = opt.state)
+    best = which.max(priorities)
+    pt = predicted.time
+    pt[best] = t.max * control$schedule.nodes + 1
+    sel.points = greedyKS(priorities, pt, (t.max * control$schedule.nodes)-1)
+    sel.points = c(sel.points, best)
   } else if(control$schedule.ks ==  "QKP"){
     predicted.time[predicted.time > t.max] = t.max * control$schedule.nodes + 1 # TODO more efficient solution
     sel.points = greedyQKS(priorities, predicted.time, createProfitMatrix(priorities, raw.points$prop.points), t.max * control$schedule.nodes)
