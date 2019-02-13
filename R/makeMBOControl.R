@@ -155,7 +155,7 @@ makeMBOControl = function(n.objectives = 1L,
   schedule.priority.time = FALSE,
   schedule.fill.random = TRUE,
   schedule.cluster = "none",
-  schedule.ks = NA_character_,
+  schedule.ks = "none",
   schedule.js = TRUE,
   time.learner = NULL,
   time.model.trafo.log = FALSE,
@@ -207,7 +207,7 @@ makeMBOControl = function(n.objectives = 1L,
   schedule.nodes = asInteger(schedule.nodes, upper = propose.points)
   }
   
-  assertChoice(schedule.priority, choices = c("infill", "explore", "exploit", "balanced"))
+  assertChoice(schedule.priority, choices = c("infill", "explore", "exploit", "balanced", "raw"))
   assertFlag(schedule.priority.time)
   assertFlag(schedule.fill.random)
   assertFlag(time.model.trafo.log)
