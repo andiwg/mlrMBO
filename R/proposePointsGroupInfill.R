@@ -98,19 +98,19 @@ proposePointsQKPCB = function(opt.state){
   if(is.null(predicted.time.se))
     predicted.time.se = rep(NA_real_, length(predicted.time))
   
-  if (control$multipoint.method == "cb" && control$schedule.priority == "exploit") {
+  if (control$infill.crit == "cb" && control$schedule.priority == "exploit") {
     priorities = -raw.points$multipoint.cb.lambdas - min(-raw.points$multipoint.cb.lambdas) + 0.1
-  }else if(control$multipoint.method == "cb" && control$schedule.priority == "explore"){
+  }else if(control$infill.crit == "cb" && control$schedule.priority == "explore"){
     priorities = raw.points$multipoint.cb.lambdas - min(raw.points$multipoint.cb.lambdas) + 0.1
-  }else if(control$multipoint.method == "cb" && control$schedule.priority == "balanced"){
+  }else if(control$infill.crit == "cb" && control$schedule.priority == "balanced"){
     priorities = -abs(log(prop$multipoint.cb.lambdas) - log(control$infill.crit.cb.lambda)) - min(-abs(log(prop$multipoint.cb.lambdas) - log(control$infill.crit.cb.lambda))) + 0.1
-  }else if(control$schedule.priority == "infill"){
+  }else if(control$infill.crit == "cb" && control$schedule.priority == "infill"){
     priorities = -raw.points$crit.vals - min(-raw.points$crit.vals) + 0.1
     priorities = priorities[,1]
   }else if (control$schedule.priority == "raw"){
     priorities = -raw.points$crit.components$mean - min(-raw.points$crit.components$mean) + 0.1
   }else {
-    stopf("Schedule Priority mehtod %s was not appliable!", control$schedule.priority)
+    stopf("Schedule Priority method %s was not appliable!", control$schedule.priority)
   } 
     
     
